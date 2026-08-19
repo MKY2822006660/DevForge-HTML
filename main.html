@@ -1,0 +1,2390 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>DevForge</title>
+</head>
+
+<body>
+
+    <div id="loader">
+        <div class="particles">
+            <div class="particle" style="--s:2px;--x:12%;--y:25%;--a:0.15;--d:8s;--e:0s;--tx:20px;--ty:-30px;--b:0px">
+            </div>
+            <div class="particle" style="--s:3px;--x:78%;--y:18%;--a:0.12;--d:11s;--e:2s;--tx:-15px;--ty:25px;--b:1px">
+            </div>
+            <div class="particle" style="--s:2px;--x:35%;--y:72%;--a:0.1;--d:9s;--e:4s;--tx:25px;--ty:10px;--b:0px">
+            </div>
+            <div class="particle" style="--s:1px;--x:88%;--y:65%;--a:0.18;--d:7s;--e:1s;--tx:-20px;--ty:-15px;--b:0px">
+            </div>
+            <div class="particle" style="--s:2px;--x:55%;--y:40%;--a:0.08;--d:13s;--e:5s;--tx:10px;--ty:20px;--b:1px">
+            </div>
+            <div class="particle" style="--s:3px;--x:22%;--y:55%;--a:0.1;--d:10s;--e:3s;--tx:-10px;--ty:-20px;--b:0px">
+            </div>
+            <div class="particle" style="--s:1px;--x:68%;--y:85%;--a:0.14;--d:8s;--e:6s;--tx:18px;--ty:-12px;--b:1px">
+            </div>
+            <div class="particle" style="--s:2px;--x:42%;--y:10%;--a:0.11;--d:12s;--e:7s;--tx:-22px;--ty:18px;--b:0px">
+            </div>
+        </div>
+
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const loaderEl = document.getElementById('loader');
+                const appEl = document.getElementById('main-app');
+
+                // Force exact 5 second delay (5000ms)
+                setTimeout(() => {
+                    if (loaderEl) {
+                        loaderEl.classList.add('is-hidden');
+
+                        // Wait 650ms for the CSS fade transition to finish
+                        setTimeout(() => {
+                            loaderEl.remove();
+                            if (appEl) {
+                                appEl.style.display = 'block';
+                                // Trigger smooth fade-in
+                                requestAnimationFrame(() => {
+                                    appEl.style.opacity = '1';
+                                    appEl.classList.add('is-visible');
+                                });
+                            }
+                            document.body.style.overflow = 'auto';
+                        }, 650);
+                    }
+                }, 5000);
+            });
+        </script>
+
+        <div class="panel-wrapper">
+            <div class="panel" id="panel">
+                <div class="ambient-orb"></div>
+
+                <div class="spinner-stage">
+                    <div class="spinner-core">
+                        <div class="ring ring--outer">
+                            <div class="orbit-dot"></div>
+                        </div>
+                        <div class="ring ring--mid"></div>
+                        <div class="ring ring--inner"></div>
+                        <div class="ring-dot"></div>
+                    </div>
+                </div>
+
+                <div class="progress-track">
+                    <div class="progress-bar"></div>
+                </div>
+
+                <div class="app-name">DevForge</div>
+                <div class="subtext">Loading models and context…</div>
+                <div class="status">Initializing<span class="dots"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-app" style="display:none;">
+
+        <div id="sidebar">
+            <div class="sidebar-icon active" data-view="chat-view" data-tooltip="Chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+
+            <div class="sidebar-icon" data-view="models-view" data-tooltip="Developer Tab">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="7" cy="5" r="3.5"></circle>
+                    <circle cx="7" cy="19" r="3.5"></circle>
+                    <circle cx="17" cy="5" r="3.5"></circle>
+                    <line x1="7" y1="9" x2="7" y2="15"></line>
+                    <path d="M7 13h6a5 5 0 0 0 5-5"></path>
+                </svg>
+
+
+            </div>
+
+
+            <div class="sidebar-icon" data-view="tab-one" data-tooltip="Models Explorer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                        d="M3 8.2c0-1.1 0-1.66.22-2.09c.19-.38.5-.69.88-.88C4.53 5 5.09 5 6.2 5h3.47c.49 0 .73 0 .96.06c.21.05.41.13.6.25c.2.12.37.29.72.64l.15.15c.35.35.52.52.72.64c.19.12.39.2.6.25c.23.06.47.06.96.06H17.8c1.12 0 1.68 0 2.09.22c.38.19.69.5.88.88c.22.43.22.99.22 2.09v7.6c0 1.12 0 1.68-.22 2.09c-.19.38-.5.69-.88.88c-.43.22-.99.22-2.09.22H6.2c-1.12 0-1.68 0-2.09-.22c-.38-.19-.69-.5-.88-.88C3 17.48 3 16.92 3 15.8V8.2z" />
+                </svg>
+
+            </div>
+            <div class="sidebar-icon" data-view="tab-two" data-tooltip="Terminal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <!-- Dash -->
+                    <line x1="13" y1="15" x2="16" y2="15"></line>
+
+                    <!-- Chevron -->
+                    <polyline points="8 15 11 12 8 9"></polyline>
+
+                    <!-- Outer window -->
+                    <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                </svg>
+
+            </div>
+
+            <div class="sidebar-icon" data-view="tab-four" data-tooltip="Model Downloads">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <!-- Bottom container -->
+                    <rect x="3" y="14" width="18" height="6" rx="3"></rect>
+
+                    <!-- Bigger down arrow (moved up, wider, taller) -->
+                    <line x1="12" y1="3" x2="12" y2="10.5"></line>
+                    <polyline points="8 7.5 12 10.5 16 7.5"></polyline>
+
+                    <!-- Dot on right -->
+                    <line x1="17" y1="17" x2="17.01" y2="17"></line>
+                </svg>
+
+
+            </div>
+
+            <div class="sidebar-icon" data-view="tab-five" data-tooltip="Extensions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                </svg>
+            </div>
+
+            <div class="sidebar-icon" data-view="tab-six" data-tooltip="Extensions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                </svg>
+            </div>
+
+            <div class="sidebar-icon" data-view="tab-seven" data-tooltip="Extensions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                </svg>
+            </div>
+
+            <div class="sidebar-icon" data-view="tab-nine" data-tooltip="Activity Monitor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+            </div>
+
+
+
+
+
+
+            <button id="openSettings" class="sidebar-profile-btn" data-tooltip="Settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M5.5 21a6.5 6.5 0 0 1 13 0"></path>
+                </svg>
+            </button>
+        </div>
+
+
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="settings-window" id="settingsWindow">
+                <button class="close-btn" id="closeBtn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <div class="sidebar">
+                    <div class="sidebar-title">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Settings
+                    </div>
+                    <div class="nav-item active" data-tab="general">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        General
+                    </div>
+                    <div class="nav-item" data-tab="appearance">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        Appearance
+                    </div>
+                    <div class="nav-item" data-tab="developer">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        Developer
+                    </div>
+                    <div class="nav-item" data-tab="chat">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Chat
+                    </div>
+                    <div class="nav-item" data-tab="model">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Model Defaults
+                    </div>
+                    <div class="nav-item" data-tab="integrations">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                        </svg>
+                        Integrations
+                    </div>
+                    <div class="nav-divider"></div>
+                    <div class="nav-item" data-tab="runtime">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg> Runtime
+                    </div>
+                    <div class="nav-item" data-tab="hardware">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                        Hardware
+                    </div>
+                    <div class="sidebar-footer" data-tab="account">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Account · Signed out
+                    </div>
+                </div>
+
+                <div class="content">
+                    <div class="tab-content active" id="general">
+                        <div class="content-title">General</div>
+                        <div class="update-banner">
+                            <div class="update-info">
+                                <div class="update-icon"><img src="assets/Logo.png" alt="Girl in a jacket" width="500"
+                                        height="600"></div>
+                                <div class="update-text">
+                                    <h3>Update available</h3>
+                                    <p>LM Studio 0.4.13 (build 1)</p>
+                                </div>
+                            </div>
+                            <div class="btn-row">
+                                <span style="color:#a5b4fc; font-size:12.5px; cursor:pointer; font-weight:500;">Release
+                                    Notes</span>
+                                <button class="btn btn-primary">Download
+                                    update</button>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">App Update</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Installed</h3>
+                                    <p>LM Studio 0.4.2 (Build 2)</p>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Updates channel</h3>
+                                </div>
+                                <div class="btn-row">
+                                    <button class="btn btn-secondary">⟳
+                                        Check</button>
+                                    <div class="custom-select-wrapper" data-select>
+                                        <div class="custom-select-trigger">
+                                            <span>Stable</span>
+                                            <span class="arrow"><svg fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg></span>
+                                        </div>
+                                        <div class="custom-select-dropdown">
+                                            <div class="custom-select-option selected" data-value="Stable">Stable</div>
+                                            <div class="custom-select-option" data-value="Beta">Beta</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">User
+                                Interface</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>App Language</h3>
+                                    <p>Choose app language (still in
+                                        development)</p>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger">
+                                        <span>English</span>
+                                        <span class="arrow"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span>
+                                    </div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="English">English</div>
+                                        <div class="custom-select-option" data-value="Español">Español</div>
+                                        <div class="custom-select-option" data-value="Français">Français</div>
+                                        <div class="custom-select-option" data-value="Deutsch">Deutsch</div>
+                                        <div class="custom-select-option" data-value="日本語">日本語</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">General
+                                Settings</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Open downloads pane on new model
+                                        download</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Always open full model loader panel</h3>
+                                    <p>Skip the quick picker and open the full
+                                        model loader instead.</p>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>My Models: always show full file
+                                        name</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Use Hugging Face Proxy</h3>
+                                    <p>Route HF downloads through LM Studio's
+                                        proxy for improved reliability.</p>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">App Info</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Open app logs</h3>
+                                </div><button class="btn btn-secondary">Open</button>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>App home directory</h3>
+                                </div>
+                                <div class="btn-row"><span class="chip chip-gray"
+                                        style="font-family:monospace;">~/.lmstudio</span><button class="btn btn-ghost"
+                                        title="Copy">📋</button></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Report bug or send feedback</h3>
+                                </div><button class="btn btn-secondary">Open in
+                                    browser ↗</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="appearance">
+                        <div class="content-title">Appearance</div>
+                        <div class="setting-group">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Color Theme</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Dark</span><span class="arrow"><svg
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Dark">Dark</div>
+                                        <div class="custom-select-option" data-value="Light">Light</div>
+                                        <div class="custom-select-option" data-value="Auto">Auto</div>
+                                        <div class="custom-select-option" data-value="Classic">Classic</div>
+                                        <div class="custom-select-option" data-value="Sepia">Sepia</div>
+                                        <div class="custom-select-option" data-value="Deep Dark">Deep
+                                            Dark</div>
+                                        <div class="custom-select-option" data-value="Solarized Dark">Solarized
+                                            Dark</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Navigation Bar position</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Left</span><span class="arrow"><svg
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Left">Left</div>
+                                        <div class="custom-select-option" data-value="Top">Top</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Chat Style</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>View Mode</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Markdown</span><span class="arrow"><svg
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Markdown">Markdown</div>
+                                        <div class="custom-select-option" data-value="Plain Text">Plain
+                                            Text</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Show tab strip scrollbar</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Font Size</h3>
+                                </div>
+                                <div class="range-input-wrapper">
+                                    <div class="range-slider"><input type="range" min="12" max="20" value="14"
+                                            oninput="this.nextElementSibling.value=this.value"></div>
+                                    <input type="number" class="range-number-input" value="14" min="12" max="20"
+                                        onchange="this.previousElementSibling.querySelector('input[type=range]').value=this.value">
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Font Weight</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Normal</span><span class="arrow"><svg
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Normal">Normal</div>
+                                        <div class="custom-select-option" data-value="Light">Light</div>
+                                        <div class="custom-select-option" data-value="Bold">Bold</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Chat messages style</h3>
+                                </div>
+                                <div class="segmented-control">
+                                    <button class="segment-option active-yes"
+                                        onclick="selectSegment(this, 'yes')">Bubble</button>
+                                    <button class="segment-option" onclick="selectSegment(this, 'no')">Block</button>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Scroll message to top on send</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Reasoning</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Expand reasoning blocks by default</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Show reasoning block vignette</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="developer">
+                        <div class="content-title">Developer</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Developer
+                                Mode</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Developer mode</h3>
+                                    <p>Shows advanced controls and experimental
+                                        settings.</p>
+                                </div>
+                                <div class="segmented-control">
+                                    <button class="segment-option" onclick="selectSegment(this, 'yes')">Yes</button>
+                                    <button class="segment-option active-no"
+                                        onclick="selectSegment(this, 'no')">No</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">On-Demand Loading
+                                and Model TTL</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>JIT models auto-evict</h3>
+                                    <p>Ensure at most 1 model is loaded via JIT
+                                        at any given time.</p>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Max idle TTL</h3>
+                                    <p>Minutes before idle models are
+                                        automatically unloaded.</p>
+                                </div>
+                                <div class="range-input-wrapper">
+                                    <div class="range-slider"><input type="range" min="5" max="180" value="60"
+                                            oninput="this.nextElementSibling.value=this.value"></div>
+                                    <input type="number" class="range-number-input" value="60" min="5" max="180"
+                                        onchange="this.previousElementSibling.querySelector('input[type=range]').value=this.value">
+                                    <span class="range-unit">min</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Local LLM
+                                Service</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Enable Local LLM Service</h3>
+                                    <p>Use LM Studio's LLM server without
+                                        keeping the app open.</p>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Runtime
+                                Settings</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Extension Packs Channel</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Stable</span><span class="arrow"><svg
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Stable">Stable</div>
+                                        <div class="custom-select-option" data-value="Beta">Beta</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Auto-update Runtime Extension Packs</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Auto-delete least recently used
+                                        packs</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="chat">
+                        <div class="content-title">Chat</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Chat Settings</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Unload current model before loading new
+                                        one</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Allow only one new empty chat</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Move deleted chats and folders to
+                                        Trash</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Double click a chat message to edit</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Show token count in chat listings</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Always show prompt template in
+                                        sidebar</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Keyboard
+                                Shortcuts</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Use Enter to send message</h3>
+                                </div>
+                                <div class="toggle" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Use Ctrl + R to regenerate last
+                                        message</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Conversation
+                                Auto-Naming</div>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="autoname"
+                                        onclick="this.closest('.radio-item').querySelectorAll('input').forEach(i=>i.checked=true); this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Never</span></label>
+                                <label class="radio-item"><input type="radio" name="autoname" checked
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Auto
+                                        — decide based on generation
+                                        speed</span></label>
+                                <label class="radio-item"><input type="radio" name="autoname"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Always
+                                        — create names regardless of
+                                        speed</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="model">
+                        <div class="content-title">Model Defaults</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Image Input</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Never exceed longest edge</h3>
+                                    <p>Images are resized proportionally to stay
+                                        within this limit.</p>
+                                </div>
+                                <div class="range-input-wrapper">
+                                    <div class="range-slider"><input type="range" min="256" max="4096" value="2048"
+                                            step="64" oninput="this.nextElementSibling.value=this.value"></div>
+                                    <input type="number" class="range-number-input" value="2048" min="256" max="4096"
+                                        step="64"
+                                        onchange="this.previousElementSibling.querySelector('input[type=range]').value=this.value">
+                                    <span class="range-unit">px</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Default Context
+                                Length</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Custom value</h3>
+                                    <p>Set a default context length for loading
+                                        new models.</p>
+                                </div>
+                                <div class="range-input-wrapper">
+                                    <div class="range-slider"><input type="range" min="512" max="131072" value="4096"
+                                            step="512" oninput="this.nextElementSibling.value=this.value"></div>
+                                    <input type="number" class="range-number-input" value="4096" min="512" max="131072"
+                                        step="512"
+                                        onchange="this.previousElementSibling.querySelector('input[type=range]').value=this.value">
+                                    <span class="range-unit">tokens</span>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Model maximum</h3>
+                                    <p>Use the maximum context length supported
+                                        by each model.</p>
+                                </div>
+                                <div class="segmented-control">
+                                    <button class="segment-option" onclick="selectSegment(this, 'yes')">Yes</button>
+                                    <button class="segment-option active-no"
+                                        onclick="selectSegment(this, 'no')">No</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Model Loading
+                                Guardrails</div>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="guardrails"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>OFF
+                                        — No precautions against
+                                        overload</span></label>
+                                <label class="radio-item"><input type="radio" name="guardrails"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Relaxed
+                                        — Mild precautions</span></label>
+                                <label class="radio-item"><input type="radio" name="guardrails"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Balanced
+                                        — Moderate precautions</span></label>
+                                <label class="radio-item"><input type="radio" name="guardrails" checked
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Strict
+                                        — Strong precautions against
+                                        overload</span></label>
+                                <label class="radio-item"><input type="radio" name="guardrails"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Custom
+                                        — Set your own limit</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="integrations">
+                        <div class="content-title">Integrations</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Tool Call
+                                Confirmation</div>
+                            <div
+                                style="padding:32px; background:var(--bg-card); border-radius:var(--radius-md); text-align:center; color:var(--text-muted); border:1px dashed var(--border); font-size:14px;">
+                                Tools you allow to run without confirmation will
+                                appear here
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="runtime">
+                        <div class="content-title">Runtime</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Runtime
+                                Selections</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>GGUF Backend</h3>
+                                </div>
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Vulkan
+                                            llama.cpp (Windows)</span><span class="arrow"><svg fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Vulkan">Vulkan llama.cpp
+                                            (Windows) v2.14.0</div>
+                                        <div class="custom-select-option" data-value="CPU">CPU llama.cpp
+                                            (Windows) v2.14.0</div>
+                                        <div class="custom-select-option" data-value="CUDA">CUDA llama.cpp
+                                            (Windows) v2.14.0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Auto-update selected Runtime Extension
+                                        Packs</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Engines &
+                                Frameworks</div>
+                            <div class="btn-row" style="margin-bottom:16px;">
+                                <input type="text" placeholder="Search engines..."
+                                    style="flex:1; padding:8px 12px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-xs); color:var(--text-primary); font-size:13px; outline:none;"
+                                    onfocus="this.style.borderColor='var(--accent)'"
+                                    onblur="this.style.borderColor='var(--border)'">
+                                <div class="custom-select-wrapper" data-select>
+                                    <div class="custom-select-trigger"><span>Compatible
+                                            only</span><span class="arrow"><svg fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg></span></div>
+                                    <div class="custom-select-dropdown">
+                                        <div class="custom-select-option selected" data-value="Compatible">Compatible
+                                            only</div>
+                                        <div class="custom-select-option" data-value="All">All types</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-ghost">Clear</button>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>CPU llama.cpp (Windows)</h3>
+                                    <p>CPU-only llama.cpp engine · v2.14.0</p>
+                                </div>
+                                <button class="btn btn-primary">Update 3.79
+                                    MB</button>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Vulkan llama.cpp (Windows)</h3>
+                                    <p>Vulkan accelerated llama.cpp engine ·
+                                        v2.14.0</p>
+                                </div>
+                                <span class="chip chip-green">✓ Latest</span>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Harmony (Windows)</h3>
+                                    <p>Chat history renderer and parser ·
+                                        v0.3.6</p>
+                                </div>
+                                <span class="chip chip-green">✓ Latest</span>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>CUDA llama.cpp (Windows)</h3>
+                                    <p>Nvidia CUDA accelerated engine ·
+                                        v2.14.0</p>
+                                </div>
+                                <span class="chip chip-red">⚠
+                                    Incompatible</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="hardware">
+                        <div class="content-title">Hardware</div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">CPU</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Intel(R) Core(TM) i5-7200U CPU @
+                                        2.50GHz</h3>
+                                    <p>Architecture: x86_64 · AVX · AVX2</p>
+                                </div>
+                                <span class="chip chip-green">✓
+                                    Compatible</span>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Memory
+                                Capacity</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>RAM</h3>
+                                </div><span style="font-family:monospace; color:var(--text-secondary);">7.89
+                                    GB</span>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>VRAM</h3>
+                                </div><span style="font-family:monospace; color:var(--text-secondary);">3.94
+                                    GB</span>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">GPUs</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Intel(R) HD Graphics 620</h3>
+                                    <p>VRAM: 3.94 GB · Vulkan · deviceIdx: 0</p>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>Offload KV Cache to GPU Memory</h3>
+                                </div>
+                                <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Resource
+                                Monitor</div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>RAM + VRAM</h3>
+                                </div><span style="font-family:monospace; color:var(--text-secondary);">0
+                                    GB</span>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3>CPU Usage</h3>
+                                </div><span style="font-family:monospace; color:var(--text-secondary);">0.00%</span>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <div class="setting-group-title">Guardrails</div>
+                            <div class="radio-group">
+                                <label class="radio-item"><input type="radio" name="hwguard"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>OFF</span></label>
+                                <label class="radio-item"><input type="radio" name="hwguard"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Relaxed</span></label>
+                                <label class="radio-item"><input type="radio" name="hwguard"
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Balanced</span></label>
+                                <label class="radio-item"><input type="radio" name="hwguard" checked
+                                        onclick="this.closest('.radio-group').querySelectorAll('.radio-item').forEach(r=>r.querySelector('input').checked=false); this.checked=true"><span>Strict</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="account">
+                        <div class="account-center">
+                            <div class="mascot">🤖</div>
+                            <h2>Publish to the LM Studio Hub</h2>
+                            <p>Create an account to publish projects, share
+                                presets, and join organizations.</p>
+                            <button class="btn btn-primary" style="padding:11px 26px; font-size:14.5px;">Log
+                                into LM Studio Hub</button>
+                            <p style="margin-top:14px; font-size:13px; color:var(--text-muted);">Don't
+                                have an account? <a href="#"
+                                    style="color:var(--accent); text-decoration:none; font-weight:500;">Sign
+                                    Up</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav id="top-nav">
+
+            <div class="nav-side" id="nav-left-side"></div>
+
+            <div class="nav-center" style="display: flex; align-items: center; justify-content: center; flex: 2;">
+                <h2 id="top-nav-title"
+                    style="display: none; font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0; letter-spacing: -0.01em;">
+                </h2>
+
+                <div class="model-center" id="model-center-nav">
+                    <div class="model-select-wrapper" id="model-dropdown-trigger">
+                        <svg class="model-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                            </path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        </svg>
+
+                        <span id="selected-model-name" class="placeholder">Select a model to load...</span>
+
+                        <svg class="model-chevron icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+
+                        <div class="loading-line" id="model-loading"></div>
+                    </div>
+
+                    <button class="eject-btn" id="eject-btn" title="Eject Model from Memory">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 15l7-7 7 7"></path>
+                            <line x1="5" y1="21" x2="19" y2="21"></line>
+                        </svg> </button>
+                </div>
+
+                <div class="custom-model-dropdown" id="custom-model-dropdown">
+
+                    <div class="dropdown-search-box">
+                        <input type="text" id="model-search-input" placeholder="Type to filter models...">
+                        <svg class="clear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+
+                    <div class="dropdown-header">
+                        <span class="header-title">Your Models</span>
+
+                    </div>
+
+                    <div class="dropdown-model-list">
+                        <div class="model-row" data-value="Qwen2.5 Coder 1.5B Instruct">
+                            <div class="col-name">Qwen2.5 Coder 1.5B Instruct
+                                <span class="tag-quant">Q8_0</span>
+                            </div>
+                            <div class="col-author">Qwen</div>
+                            <div class="col-params">1.5B</div>
+                            <div class="col-arch"><span class="tag-arch arch-red">qwen2</span></div>
+                            <div class="col-format"><span class="tag-format">GGUF</span></div>
+                            <div class="col-size">1.76 GB <svg viewBox="0 0 24 24">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg></div>
+                        </div>
+
+                        <div class="model-row" data-value="Deepseek Coder 1.3B Instruct">
+                            <div class="col-name">Deepseek Coder 1.3B Instruct
+                                <span class="tag-quant">Q8_0</span>
+                            </div>
+                            <div class="col-author">TheBloke</div>
+                            <div class="col-params">1.3B</div>
+                            <div class="col-arch"><span class="tag-arch arch-blue">llama</span></div>
+                            <div class="col-format"><span class="tag-format">GGUF</span></div>
+                            <div class="col-size">1.33 GB <svg viewBox="0 0 24 24">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg></div>
+                        </div>
+
+                        <div class="model-row" data-value="Model">
+                            <div class="col-name">Model <span class="tag-quant">Q8</span></div>
+                            <div class="col-author">youssefjouini</div>
+                            <div class="col-params">1B</div>
+                            <div class="col-arch"><span class="tag-arch arch-gray">starcoder</span></div>
+                            <div class="col-format"><span class="tag-format">GGUF</span></div>
+                            <div class="col-size">1.23 GB <svg viewBox="0 0 24 24">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg></div>
+                        </div>
+
+                        <div class="model-row" id="custom-api-trigger">
+                            <div class="col-name" style="color: #60a5fa;">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                    stroke-width="2" style="margin-right: 6px;">
+                                    <path
+                                        d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9">
+                                    </path>
+                                </svg>
+                                Connect Custom API (Ollama, etc.)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-footer">
+                        <div class="toggle-switch active" id="manual-params-toggle"
+                            onclick="this.classList.toggle('active')"></div>
+                        <span>Manually choose model load parameters (or hold
+                            <kbd>Alt</kbd>)</span>
+                    </div>
+
+                </div>
+
+                <div class="nav-side nav-right">
+                    <button class="widget-toggle" id="widgetToggle"
+                        style="display: none; position: static; background: var(--surface-raised); border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 12px; border-radius: 8px; cursor: pointer; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--accent)"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" />
+                            <path d="M8 21h8" />
+                            <path d="M12 17v4" />
+                        </svg>
+                        System Monitor
+                    </button>
+                </div>
+        </nav>
+
+        <div id="config-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Model Config <span>Beta</span></h3>
+                    <button class="close-modal-btn" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-row">
+                        <div class="config-header">
+                            <div class="config-label">Context Length <svg class="help-icon" width="12" height="12"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg></div>
+                            <span style="font-size: 11px; color: var(--text-muted);">Model
+                                supports up to 32768 tokens</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="1024" max="32768" step="1024" value="7243" id="ctx-slider">
+                            <input type="text" class="number-input" value="7243" id="ctx-input">
+                        </div>
+                    </div>
+                    <div class="config-row">
+                        <div class="config-header">
+                            <div class="config-label">GPU Offload <svg class="help-icon" width="12" height="12"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg></div>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" step="1" value="28" id="gpu-slider">
+                            <input type="text" class="number-input" value="28" id="gpu-input">
+                        </div>
+                    </div>
+                    <div class="config-row">
+                        <div class="config-header">
+                            <div class="config-label">CPU Thread Pool Size
+                                <svg class="help-icon" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="1" max="16" step="1" value="1" id="cpu-slider">
+                            <input type="text" class="number-input" value="1" id="cpu-input">
+                        </div>
+                    </div>
+
+                    <div class="toggle-row" style="margin-top: 10px;">
+                        <div class="config-label">Evaluation Batch Size <svg class="help-icon" width="12" height="12"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg></div>
+                        <input type="text" class="number-input" value="512" readonly>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="config-label">Max Concurrent Predictions
+                            <span class="badge">Experimental</span>
+                        </div>
+                        <input type="text" class="number-input" value="4" readonly>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="config-label">Unified KV Cache <span class="badge">Experimental</span></div>
+                        <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="config-label">Offload KV Cache to GPU
+                            Memory <svg class="help-icon" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg></div>
+                        <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="config-label">Flash Attention <svg class="help-icon" width="12" height="12"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg></div>
+                        <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+                    </div>
+                    <br>
+                    <span>Please choose a generation architecture:</span>
+                    <div class="ai-modes-panel" id="modesPanel" role="dialog" aria-hidden="true">
+                        <div class="ai-modes-grid">
+                            <div class="mode-card" data-mode="3d">
+                                <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2l10 5v10l-10 5-10-5V7l10-5z" />
+                                    <path d="M12 22V12" />
+                                    <path d="M22 7l-10 5M2 7l10 5" />
+                                </svg>
+                                <div class="mode-title">3D Generation</div>
+                                <div class="mode-desc">Generate textured 3D
+                                    models from text or image inputs.</div>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                            </div>
+
+                            <div class="mode-card" data-mode="image">
+                                <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <path d="M21 15l-5-5L5 21" />
+                                </svg>
+                                <div class="mode-title">Image
+                                    Generation</div>
+                                <div class="mode-desc">Create
+                                    high-resolution images from natural
+                                    language prompts.</div>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                            </div>
+
+                            <div class="mode-card" data-mode="video">
+                                <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                                    <path d="M10 9l5 3-5 3V9z" />
+                                </svg>
+                                <div class="mode-title">Video
+                                    Generation</div>
+
+                                <div class="mode-desc">Render short
+                                    cinematic clips from prompts or
+                                    keyframes.</div>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                            </div>
+
+                            <div class="mode-card" data-mode="flux44">
+                                <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 12c4-6 6-6 9 0s5 6 9 0" />
+                                    <circle cx="6" cy="12" r="1.5" fill="currentColor" />
+                                    <circle cx="18" cy="12" r="1.5" fill="currentColor" />
+                                </svg>
+                                <div class="mode-title">App Builder</div>
+                                <div class="mode-desc">Build custom applications with ease.</div>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                            </div>
+
+                            <div class="mode-card" data-mode="text">
+                                <svg class="mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 6h16M4 10h16M4 14h12M4 18h8" />
+                                </svg>
+                                <div class="mode-title">Text
+                                    Generation</div>
+                                <div class="mode-desc">Generate structured
+                                    prose, code, or conversational
+                                    responses.</div>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 6L9 17l-5-5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="footer-left">
+                        <div class="toggle-switch active" style="transform: scale(0.8);"
+                            onclick="this.classList.toggle('active')"></div>
+                        Remember settings for this model
+                    </div>
+                    <button class="load-model-btn" id="confirm-load-btn">
+                        Load Model <span>Ctrl + Enter</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast-container"></div>
+
+        <div id="main-views-container">
+            <div id="chat-view" class="main-view active" style="display: flex;">
+                <div id="workspace">
+
+                    <div id="left-split">
+                        <div id="output-area"></div>
+                        <div id="welcome-message">
+                            <h1>Welcome, [name]</h1>
+                        </div>
+                        <div id="input-container" class="enhanced-input">
+                            <div id="attachments-container"></div>
+
+                            <div class="input-row">
+                                <div class="attach-wrapper">
+                                    <button class="upload-btn" id="attach-btn" title="Attach file">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                            </path>
+                                        </svg>
+                                    </button>
+
+
+
+                                    <div class="attach-dropdown" id="attach-dropdown">
+                                        <div class="dropdown-item" id="upload-file-option">
+                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                            Upload File
+                                        </div>
+                                        <div class="dropdown-item">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                                    <path
+                                                        d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                                    </path>
+                                                </svg>
+                                                <span>Allow Web Access</span>
+                                            </div>
+                                            <div class="toggle" id="web-access-toggle"
+                                                onclick="this.classList.toggle('active')" style="margin-left: auto;">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="hidden-file-input" multiple style="display: none;">
+                                </div>
+
+                                <textarea id="main-input" placeholder="How can I help you today?" rows="1"></textarea>
+
+                                <button class="submit-btn" id="submit-btn" title="Send message">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="resizer"></div>
+
+                    <div id="right-split">
+
+                        <div id="mode-flux44" class="mode-view"
+                            style="display: flex; flex-direction: column; height: 100%;">
+                            <div class="sandbox-header">
+                                <button class="reload-btn" id="sandbox-reload" title="Reload Frame">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polyline points="23 4 23 10 17 10"></polyline>
+                                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                    </svg>
+                                </button>
+                                <div class="sandbox-url-bar">
+                                    <select id="sandbox-page-select">
+                                        <option value="https://example.com">example.com/</option>
+                                        <option value="https://example.com/happy">example.com/happy</option>
+                                        <option value="https://example.com/dashboard">example.com/dashboard</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="sandbox-body">
+                                <div id="building-anim">
+                                    <div class="loader-ring"></div>
+                                    <div class="anim-text">GENERATING ARTIFACT...</div>
+                                </div>
+                                <iframe id="preview-iframe" src></iframe>
+                            </div>
+                        </div>
+
+                        <div id="mode-3d" class="mode-view"
+                            style="display: none; flex-direction: column; height: 100%; padding: 20px;">
+                            <div id="viewport">
+                                <model-viewer id="mv" src="model.glb" camera-controls auto-rotate auto-rotate-delay="0"
+                                    shadow-intensity="1.2" shadow-softness="0.5" exposure="1.2"
+                                    environment-image="neutral" interaction-prompt="none">
+                                    <div class="progress-bar" slot="progress-bar">
+                                        <div class="update-bar" id="update-bar"></div>
+                                    </div>
+                                </model-viewer>
+
+                                <div id="viewGrid">
+                                    <button class="grid-btn" data-view="top">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <rect x="4" y="4" width="8" height="16" fill="currentColor"
+                                                fill-opacity="0.5" />
+                                            <rect x="12" y="4" width="8" height="16" fill="currentColor"
+                                                fill-opacity="0.2" />
+                                        </svg> Top
+                                    </button>
+                                    <button class="grid-btn" data-view="bottom">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <rect x="4" y="4" width="16" height="16" fill="currentColor"
+                                                fill-opacity="0.5" />
+                                        </svg> Bottom
+                                    </button>
+                                    <button class="grid-btn" data-view="isometric">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" fill="currentColor"
+                                                fill-opacity="0.2" />
+                                            <path d="M12 3v9 M12 12l8-4.5 M12 12l-8-4.5" />
+                                        </svg> Iso
+                                    </button>
+                                    <button class="grid-btn" data-view="left">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <rect x="4" y="4" width="16" height="16" fill="currentColor"
+                                                fill-opacity="0.5" />
+                                        </svg> Left
+                                    </button>
+                                    <button class="grid-btn" data-view="right">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <rect x="4" y="12" width="16" height="8" fill="currentColor"
+                                                fill-opacity="0.5" />
+                                            <rect x="4" y="4" width="16" height="8" fill="currentColor"
+                                                fill-opacity="0.2" />
+                                        </svg> Right
+                                    </button>
+                                    <button class="grid-btn" data-view="front">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <path d="M4 4v16h16v-8h-8V4H4z" fill="currentColor" fill-opacity="0.5" />
+                                        </svg> Front
+                                    </button>
+                                    <button class="grid-btn" data-view="back">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <path d="M20 4v16H4v-8h8V4h8z" fill="currentColor" fill-opacity="0.5" />
+                                        </svg> Back
+                                    </button>
+                                    <button class="grid-btn" data-view="dimetric">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <path d="M12 4l9 3v10l-9 3-9-3V7l9-3z" fill="currentColor"
+                                                fill-opacity="0.2" />
+                                            <path d="M12 4v10 M12 14l9-3 M12 14l-9-3" />
+                                        </svg> Dimetric
+                                    </button>
+                                    <button class="grid-btn" data-view="trimetric">
+                                        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linejoin="round">
+                                            <path d="M11 3l9 6v9l-9 3-7-5V8l7-5z" fill="currentColor"
+                                                fill-opacity="0.2" />
+                                            <path d="M11 3v10 M11 13l9-4 M11 13l-7-5" />
+                                        </svg> Trimetric
+                                    </button>
+                                </div>
+
+                                <div id="meshDetailsPanel" class="floating-panel">
+                                    <div class="panel-header">
+                                        <b>Mesh Details</b>
+                                        <button class="collapse-btn"
+                                            onclick="togglePanel('meshDetailsPanel', document.getElementById('btnMeshStats'))">✖</button>
+                                    </div>
+                                    <div id="meshStatsContent">
+                                        <div class="stat-row"><span class="stat-label">Dimensions (XYZ)</span><span
+                                                class="stat-value" id="statDimensions">0 x 0 x 0 m</span></div>
+                                        <div class="stat-row"><span class="stat-label">Total Faces
+                                                (Triangles)</span><span class="stat-value" id="statTriangles">0</span>
+                                        </div>
+                                        <div class="stat-row"><span class="stat-label">Total Vertices</span><span
+                                                class="stat-value" id="statVertices">0</span></div>
+                                        <div class="stat-row"><span class="stat-label">Materials Count</span><span
+                                                class="stat-value" id="statMaterials">0</span></div>
+                                    </div>
+                                </div>
+
+                                <div id="toolbar">
+                                    <button class="tool-btn" data-tooltip="Standard Views (V)" id="btnViews"><svg
+                                            class="tool-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2l-3 3h6zm0 20l3-3h-6zM2 12l3 3V9zm20 0l-3-3v6z" />
+                                            <path d="M12 9a3 3 0 100 6 3 3 0 000-6z" />
+                                            <path
+                                                d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z" />
+                                        </svg></button>
+                                    <button class="tool-btn" data-tooltip="Reset Camera (R)" id="btnReset"><svg
+                                            class="tool-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                                        </svg></button>
+                                    <button class="tool-btn active" data-tooltip="Auto Rotate (Space)"
+                                        id="btnRotate"><svg class="tool-icon" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                            <path d="M3 3v5h5" />
+                                        </svg></button>
+                                    <button class="tool-btn active" data-tooltip="Environment Lighting" id="btnEnv"><svg
+                                            class="tool-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
+                                        </svg></button>
+                                    <button class="tool-btn" data-tooltip="Mesh Details (M)" id="btnMeshStats"><svg
+                                            class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <path d="M12 16v-4" />
+                                            <path d="M12 8h.01" />
+                                        </svg></button>
+                                    <button class="tool-btn" data-tooltip="Fullscreen (F)" id="btnFullscreen"><svg
+                                            class="tool-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+                                        </svg></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mode-image" class="mode-view"
+                            style="display: none; flex-direction: column; height: 100%; padding: 0;">
+                            <div class="result-panel">
+                                <div class="loading-overlay" id="loadingOverlay">
+                                    <div class="spinner"></div>
+                                    <div class="loading-text">AI is generating your image<span
+                                            class="loading-dots"></span>
+                                    </div>
+                                </div>
+                                <div class="image-container" id="imageContainer" style="display: none;">
+                                    <span class="version-badge" id="versionBadge">v1.0</span>
+                                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=80"
+                                        alt="AI Generated Image" id="generatedImage">
+                                </div>
+                            </div>
+
+                            <div class="actions-bar" id="actionsBar">
+                                <div class="download-group">
+                                    <button class="download-btn" id="downloadBtn" title="Download Image">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                                        </svg>
+                                        <span>Download</span>
+                                    </button>
+                                    <div class="divider"></div>
+                                    <button class="version-trigger" id="versionTrigger" title="Select Version">
+                                        <span id="selectedVersion">v1.0</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <div class="version-dropdown" id="versionDropdown">
+                                        <div class="version-item active" data-version="v1.0"
+                                            data-image="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=80">
+                                            Version 1.0 <span class="status current">Current</span>
+                                        </div>
+                                        <div class="version-item" data-version="v1.1"
+                                            data-image="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&q=80">
+                                            Version 1.1 <span class="status">Available</span>
+                                        </div>
+                                        <div class="version-item" data-version="v1.2"
+                                            data-image="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80">
+                                            Version 1.2 <span class="status new">New</span>
+                                        </div>
+                                        <div class="version-item" data-version="v2.0"
+                                            data-image="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80">
+                                            Version 2.0 <span class="status new">New</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="metadata-panel" id="metadataPanel">
+                                <div class="metadata-grid">
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Dimensions</div>
+                                        <div class="metadata-value highlight" id="dimensions">1024 × 1024 px</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">File Size</div>
+                                        <div class="metadata-value" id="fileSize">2.4 MB</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Aspect Ratio</div>
+                                        <div class="metadata-value">1:1</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Format</div>
+                                        <div class="metadata-value">PNG</div>
+                                    </div>
+                                    <div class="metadata-item full-width">
+                                        <div class="metadata-label">Generation Details</div>
+                                        <div class="generation-details">
+                                            <strong>Model:</strong> Stable Diffusion XL ·
+                                            <strong>Steps:</strong> 32 ·
+                                            <strong>CFG Scale:</strong> 7.5 ·
+                                            <strong>Seed:</strong> <span id="seed">492847103</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mode-video" class="mode-view"
+                            style="display: none; flex-direction: column; height: 100%; padding: 0;">
+                            <div class="result-panel">
+                                <div class="loading-overlay" id="loadingOverlay">
+                                    <div class="spinner"></div>
+                                    <div class="loading-text">AI is generating your video<span
+                                            class="loading-dots"></span>
+                                    </div>
+                                </div>
+                                <div class="video-container" id="videoContainer" style="display: none;">
+                                    <span class="version-badge" id="versionBadge">v1.0</span>
+                                    <video id="generatedVideo" controls preload="metadata">
+                                        <source
+                                            src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                                            type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+
+                            <div class="actions-bar" id="actionsBar">
+                                <div class="download-group">
+                                    <button class="download-btn" id="downloadBtn" title="Download Video">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                                        </svg>
+                                        <span>Download</span>
+                                    </button>
+                                    <div class="divider"></div>
+                                    <button class="version-trigger" id="versionTrigger" title="Select Version">
+                                        <span id="selectedVersion">v1.0</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+
+                                    <div class="version-dropdown" id="versionDropdown">
+                                        <div class="version-item active" data-version="v1.0"
+                                            data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4">
+                                            Version 1.0 <span class="status current">Current</span>
+                                        </div>
+                                        <div class="version-item" data-version="v1.1"
+                                            data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4">
+                                            Version 1.1 <span class="status">Available</span>
+                                        </div>
+                                        <div class="version-item" data-version="v1.2"
+                                            data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4">
+                                            Version 1.2 <span class="status new">New</span>
+                                        </div>
+                                        <div class="version-item" data-version="v2.0"
+                                            data-video="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4">
+                                            Version 2.0 <span class="status new">New</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="metadata-panel" id="metadataPanel">
+                                <div class="metadata-grid">
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Resolution</div>
+                                        <div class="metadata-value highlight" id="resolution">1920 × 1080</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Duration</div>
+                                        <div class="metadata-value" id="duration">0:15</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Frame Rate</div>
+                                        <div class="metadata-value" id="frameRate">30 fps</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Codec</div>
+                                        <div class="metadata-value">H.264</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">File Size</div>
+                                        <div class="metadata-value" id="fileSize">12.4 MB</div>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <div class="metadata-label">Format</div>
+                                        <div class="metadata-value">MP4</div>
+                                    </div>
+                                    <div class="metadata-item full-width">
+                                        <div class="metadata-label">Generation Details</div>
+                                        <div class="generation-details">
+                                            <strong>Model:</strong> Runway Gen-2 ·
+                                            <strong>Steps:</strong> 50 ·
+                                            <strong>CFG Scale:</strong> 8.0 ·
+                                            <strong>Seed:</strong> <span id="seed">847291056</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mode-text" class="mode-view"
+                            style="display: none; flex-direction: column; height: 100%; padding: 20px;">
+                            <h3 style="color: var(--text-secondary); margin-bottom: 10px;">Text Generation Workspace
+                            </h3>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div id="tab-one" class="main-view">
+                <div class="container">
+
+
+                    <div class="app-container">
+                        <!-- LEFT SIDEBAR -->
+                        <aside class="explorer-sidebar">
+                            <div class="search-box">
+                                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.3-4.3" />
+                                </svg>
+                                <input type="text" class="search-input" placeholder="Search models..." id="searchInput">
+                            </div>
+                            <div class="model-list" id="modelList">
+                                <!-- JS Injected -->
+                            </div>
+                        </aside>
+
+                        <!-- RIGHT MAIN PANEL -->
+                        <main class="main-panel">
+                            <!-- Empty State -->
+                            <div id="emptyState" class="empty-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1" style="margin-bottom:16px; opacity:0.5;">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                </svg>
+                                <p>Select a model to inspect metadata</p>
+                            </div>
+
+                            <!-- Detail View (Hidden by default) -->
+                            <div id="detailView" style="display:none; height:100%; flex-direction:column;">
+
+                                <!-- Header -->
+                                <div class="panel-header">
+                                    <div class="header-title">
+                                        <h1 id="modelName">Llama-3-8B-Instruct</h1>
+                                        <div class="header-subtitle" id="modelPath">~/Library/Application
+                                            Support/LM-Studio/models/...
+                                        </div>
+                                    </div>
+                                    <div class="actions">
+                                        <button class="btn" onclick="openFolder()" title="Open in Finder">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path
+                                                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                                            </svg>
+                                            Show
+                                        </button>
+                                        <button class="btn" onclick="zipModel()" title="Zip for sharing">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                <polyline points="7 10 12 15 17 10" />
+                                                <line x1="12" y1="15" x2="12" y2="3" />
+                                            </svg>
+                                            Zip
+                                        </button>
+                                        <button class="btn danger" onclick="confirmDelete()" title="Delete Model">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <polyline points="3 6 5 6 21 6" />
+                                                <path
+                                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Scrollable Content -->
+                                <div class="content-scroll">
+
+                                    <!-- Tabs -->
+                                    <div class="tabs">
+                                        <div class="tab active" onclick="switchTab('overview')">Overview</div>
+                                        <div class="tab" onclick="switchTab('technical')">Deep Technical</div>
+                                        <div class="tab" onclick="switchTab('files')">Files & Integrity</div>
+                                        <div class="tab" onclick="switchTab('hardware')">Hardware Fit</div>
+                                    </div>
+
+                                    <!-- TAB: OVERVIEW -->
+                                    <div id="tab-overview">
+                                        <div class="grid-4">
+                                            <div class="info-card">
+                                                <div class="card-label">Unified Memory Req.</div>
+                                                <div class="card-value" id="ov-memory">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Quantization</div>
+                                                <div class="card-value card-mono" id="ov-quant">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Context Window</div>
+                                                <div class="card-value" id="ov-context">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Est. Token Speed</div>
+                                                <div class="card-value" id="ov-speed">--</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="section-title">Description</div>
+                                        <div class="info-card"
+                                            style="margin-bottom:24px; line-height:1.5; color:var(--text-secondary);">
+                                            <p id="ov-desc">--</p>
+                                        </div>
+
+                                        <div class="grid-2">
+                                            <div class="info-card">
+                                                <div class="card-label">Architecture</div>
+                                                <div class="card-value" id="ov-arch">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">License</div>
+                                                <div class="card-value" id="ov-license">--</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- TAB: TECHNICAL -->
+                                    <div id="tab-technical" style="display:none;">
+                                        <div class="section-title">Model Internals</div>
+                                        <div class="info-card" style="padding:0; overflow:hidden; margin-bottom:24px;">
+                                            <table class="data-table">
+                                                <tbody id="tech-table-body">
+                                                    <!-- JS Injected -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="section-title">Tokenizer & Vocab</div>
+                                        <div class="grid-3">
+                                            <div class="info-card">
+                                                <div class="card-label">Type</div>
+                                                <div class="card-value" id="tech-tokenizer">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Vocab Size</div>
+                                                <div class="card-value" id="tech-vocab">--</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Rope Scaling</div>
+                                                <div class="card-value" id="tech-rope">--</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- TAB: FILES -->
+                                    <div id="tab-files" style="display:none;">
+                                        <div class="grid-2">
+                                            <div class="info-card">
+                                                <div class="card-label">SHA256 Hash</div>
+                                                <div class="card-mono" style="word-break:break-all; font-size:11px;"
+                                                    id="file-hash">--
+                                                </div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Last Modified</div>
+                                                <div class="card-value" id="file-date">--</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="section-title" style="margin-top:24px;">
+                                            Directory Contents
+                                            <button class="btn"
+                                                style="margin-left:auto; font-size:10px; padding:2px 8px;"
+                                                onclick="openFileModal()">Expand All</button>
+                                        </div>
+                                        <div class="info-card" style="padding:0;">
+                                            <div class="file-row file-header">
+                                                <div>Name</div>
+                                                <div>Path</div>
+                                                <div>Type</div>
+                                                <div style="text-align:right">Size</div>
+                                            </div>
+                                            <div id="file-list-preview">
+                                                <!-- JS Injected -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- TAB: HARDWARE -->
+                                    <div id="tab-hardware" style="display:none;">
+                                        <div class="section-title">Apple Silicon Optimization</div>
+                                        <div class="grid-2">
+                                            <div class="info-card">
+                                                <div class="card-label">Detected Chip</div>
+                                                <div class="card-value">Apple M2 Max (Simulated)</div>
+                                            </div>
+                                            <div class="info-card">
+                                                <div class="card-label">Unified Memory Available</div>
+                                                <div class="card-value">32 GB</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="section-title">Performance Estimates</div>
+                                        <div class="info-card" style="padding:0; overflow:hidden;">
+                                            <table class="data-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Metric</th>
+                                                        <th>Value</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="hw-table-body">
+                                                    <!-- JS Injected -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+
+                    <!-- FILE EXPLORER MODAL -->
+                    <div class="modal-overlay" id="fileModal">
+                        <div class="modal-window">
+                            <div class="modal-header">
+                                <span style="font-weight:600">Model Directory</span>
+                                <button class="btn" onclick="closeFileModal()"
+                                    style="border:none; background:transparent; font-size:18px; padding:0;">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="file-row file-header">
+                                    <div>Name</div>
+                                    <div>Path</div>
+                                    <div>Type</div>
+                                    <div style="text-align:right">Size</div>
+                                </div>
+                                <div id="modal-file-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DELETE CONFIRMATION MODAL -->
+                    <div class="modal-overlay" id="deleteModal">
+                        <div class="modal-window small">
+                            <div class="modal-header">
+                                <span style="font-weight:600; color:var(--accent-red)">Delete Model</span>
+                                <button class="btn" onclick="closeDeleteModal()"
+                                    style="border:none; background:transparent; font-size:18px; padding:0;">&times;</button>
+                            </div>
+                            <div class="modal-body" style="padding: 20px;">
+                                <p style="margin-bottom:10px;">Are you sure you want to delete <strong
+                                        id="deleteTargetName">this
+                                        model</strong>?</p>
+                                <p style="color:var(--text-secondary); font-size:12px;">This action cannot be undone.
+                                    The files will be
+                                    permanently removed from your disk.</p>
+
+                                <div id="deleteProgressArea" style="display:none;">
+                                    <div class="progress-container">
+                                        <div class="progress-bar" id="deleteProgressBar"></div>
+                                    </div>
+                                    <div class="delete-text" style="margin-top:8px; text-align:right;"
+                                        id="deleteStatusText">
+                                        Preparing...</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer" id="deleteFooter">
+                                <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+                                <button class="btn danger" id="confirmDeleteBtn"
+                                    onclick="executeDelete()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div id="tab-two" class="main-view">
+                <div class="container">
+
+                    <div class="tab-bar">
+                        <div class="tabs-container" id="tabs-container">
+                        </div>
+                        <div class="tab-actions">
+                            <button class="action-btn" id="new-tab-btn" title="New Tab (⌘T)">+</button>
+                            <button class="action-btn" id="restart-btn" title="Restart Terminal">↻</button>
+                        </div>
+                    </div>
+
+                    <div class="terminal-wrapper" id="terminal-wrapper">
+                        <div class="terminal-body" id="terminal-body">
+                            <div id="output"></div>
+                            <div class="input-wrapper">
+                                <span class="prompt">username@mac <span id="pwd-display">~</span> %</span>
+                                <input type="text" id="cmd-input" autocomplete="off" spellcheck="false" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tab-three" class="main-view">
+                <div class="container">
+                    <h1 style="padding: 20px;">Extensions View</h1>
+                </div>
+            </div>
+            <div id="models-view" class="main-view">
+                <div class="container">
+                    <div>
+
+
+
+
+                </div>
+            </div>
+
+            <div id="server-view" class="main-view">
+                <div class="container">
+                    <h1 style="padding: 20px;">This is the space</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <div class="preview-modal-overlay" id="file-preview-modal">
+        <div class="preview-window">
+            <div class="preview-header">
+                <div class="preview-title" id="preview-title">File Preview</div>
+                <button class="close-btn static" id="close-preview-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="preview-content-area" id="preview-content-area">
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="widget-panel" id="widgetPanel">
+        <div class="widget-header">
+            <h3>System Monitor</h3>
+            <button class="close-btn" id="widgetClose">✕</button>
+        </div>
+
+        <div class="widget-tabs">
+            <div class="widget-tab active" data-tab="w-cpu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <path d="M9 9h6v6H9z" />
+                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+                </svg>CPU
+            </div>
+            <div class="widget-tab" data-tab="w-ram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <path d="M8 10h8M8 14h8M10 8v8M14 8v8" />
+                </svg>RAM
+            </div>
+            <div class="widget-tab" data-tab="w-gpu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="6" width="20" height="12" rx="2" />
+                    <path d="M6 12h4M6 16h4M14 12h4M14 16h4" />
+                    <path d="M12 6V2M8 6V4M16 6V4" />
+                </svg>GPU
+            </div>
+            <div class="widget-tab" data-tab="w-net">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                    <circle cx="12" cy="20" r="1" />
+                </svg>Net
+            </div>
+            <div class="widget-tab" data-tab="w-bat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="6" width="18" height="12" rx="2" />
+                    <path d="M23 13v-2" />
+                </svg>Batt
+            </div>
+        </div>
+
+        <div class="widget-content">
+            <div class="tab-content active" id="w-cpu">
+                <div class="gauge-container">
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 110 110">
+                            <circle class="gauge-bg" cx="55" cy="55" r="44" />
+                            <circle class="gauge-fill" cx="55" cy="55" r="44" stroke="#0A84FF" stroke-dasharray="276.46"
+                                stroke-dashoffset="155" id="wCpuGauge" />
+                        </svg>
+                        <div class="gauge-text"><span class="value" id="wCpuVal">38%</span><span
+                                class="label">CPU</span></div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-val" id="wCpuTemp">71°C</div>
+                        <div class="stat-label">Temperature</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wCpuCores">8/16</div>
+                        <div class="stat-label">Active Cores</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wCpuFreq">4.2</div>
+                        <div class="stat-label">GHz Speed</div>
+                    </div>
+                </div>
+                <div class="usage-history">
+                    <h4>Activity History</h4><canvas id="wCpuChart"></canvas>
+                </div>
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--red)"></div><span
+                            class="breakdown-label">System</span><span class="breakdown-value" id="wCpuSys">16%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--accent)"></div><span
+                            class="breakdown-label">User</span><span class="breakdown-value" id="wCpuUser">23%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--text-dim)"></div><span
+                            class="breakdown-label">Idle</span><span class="breakdown-value" id="wCpuIdle">61%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="w-ram">
+                <div class="gauge-container">
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 110 110">
+                            <circle class="gauge-bg" cx="55" cy="55" r="44" />
+                            <circle class="gauge-fill" cx="55" cy="55" r="44" stroke="#32D74B" stroke-dasharray="276.46"
+                                stroke-dashoffset="100" id="wRamGauge" />
+                        </svg>
+                        <div class="gauge-text"><span class="value" id="wRamVal">60%</span><span
+                                class="label">RAM</span></div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-val" id="wRamUsed">9.6 GB</div>
+                        <div class="stat-label">Memory Used</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wRamTotal">16 GB</div>
+                        <div class="stat-label">Total Size</div>
+                    </div>
+                </div>
+                <div class="usage-history">
+                    <h4>Memory Pressure</h4><canvas id="wRamChart"></canvas>
+                </div>
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--accent)"></div><span class="breakdown-label">App
+                            Memory</span><span class="breakdown-value" id="wRamApps">5.1 GB</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--orange)"></div><span class="breakdown-label">Wired
+                            Memory</span><span class="breakdown-value" id="wRamWired">2.7 GB</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--purple)"></div><span
+                            class="breakdown-label">Compressed</span><span class="breakdown-value" id="wRamComp">1.9
+                            GB</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="w-gpu">
+                <div class="gauge-container">
+                    <div class="gauge-wrapper">
+                        <svg viewBox="0 0 110 110">
+                            <circle class="gauge-bg" cx="55" cy="55" r="44" />
+                            <circle class="gauge-fill" cx="55" cy="55" r="44" stroke="#FF9F0A" stroke-dasharray="276.46"
+                                stroke-dashoffset="150" id="wGpuGauge" />
+                        </svg>
+                        <div class="gauge-text"><span class="value" id="wGpuVal">40%</span><span
+                                class="label">GPU</span></div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-val" id="wGpuTemp">58°C</div>
+                        <div class="stat-label">Temperature</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wGpuVram">4.2 GB</div>
+                        <div class="stat-label">VRAM Usage</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wGpuWatt">120W</div>
+                        <div class="stat-label">Power Draw</div>
+                    </div>
+                </div>
+                <div class="usage-history">
+                    <h4>Activity History</h4><canvas id="wGpuChart"></canvas>
+                </div>
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--orange)"></div><span class="breakdown-label">3D
+                            Render</span><span class="breakdown-value" id="wGpu3D">28%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-dot" style="color:var(--accent)"></div><span class="breakdown-label">Video
+                            Encode</span><span class="breakdown-value" id="wGpuVid">12%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="w-net">
+                <div class="net-stats">
+                    <div class="net-stat up">
+                        <div class="speed" id="wNetUp">35</div>
+                        <div class="unit">KB/s</div>
+                        <div class="direction">Upload</div>
+                    </div>
+                    <div class="net-stat down">
+                        <div class="speed" id="wNetDown">4.7</div>
+                        <div class="unit">MB/s</div>
+                        <div class="direction">Download</div>
+                    </div>
+                </div>
+                <div class="usage-history">
+                    <h4>Traffic History</h4><canvas id="wNetChart"></canvas>
+                </div>
+                <div class="info-list">
+                    <div class="info-item"><span class="info-label">Public IP</span><span class="info-value"
+                            id="wNetPubIP">192.168.1.42</span></div>
+                    <div class="info-item"><span class="info-label">Local IP</span><span class="info-value"
+                            id="wNetLocIP">192.168.1.42</span></div>
+                    <div class="info-item"><span class="info-label">Interface</span><span class="info-value"
+                            id="wNetIface">Wi-Fi
+                            (en0)</span></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="w-bat">
+                <div class="battery-bar">
+                    <div class="battery-fill" id="wBatFill" style="width:75%;"></div>
+                    <div class="battery-percent" id="wBatPct">75%</div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-val" id="wBatHealth">94%</div>
+                        <div class="stat-label">Health</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wBatCycles">312</div>
+                        <div class="stat-label">Cycle Count</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" id="wBatTime">4h 23m</div>
+                        <div class="stat-label">Time Remaining</div>
+                    </div>
+                </div>
+                <div class="devforge-power">
+                    <div class="df-label">DevForge Power Usage</div>
+                    <div class="df-val" id="wBatDevForge">18.4 W</div>
+                </div>
+                <div class="info-list" style="margin-top:16px;">
+                    <div class="info-item"><span class="info-label">Power Source</span><span class="info-value"
+                            id="wBatStatus">Battery</span></div>
+                    <div class="info-item"><span class="info-label">Voltage</span><span class="info-value"
+                            id="wBatVolt">12.4V</span></div>
+                    <div class="info-item"><span class="info-label">Design Capacity</span><span class="info-value"
+                            id="wBatDesign">82.0 Wh</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="widget-footer">
+            <a href="dashboard.html" class="full-dash-btn">Activity Monitor</a>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="api-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 420px; padding: 0; min-height: auto;">
+            <div class="modal-header" style="border-bottom: 1px solid var(--border-color); padding: 16px 20px;">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent)" stroke-width="2">
+                        <path
+                            d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9">
+                        </path>
+                    </svg>
+                    Connect Custom API
+                </h3>
+                <button class="close-modal-btn" id="close-api-modal">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; gap: 16px; display: flex; flex-direction: column;">
+                <div>
+                    <div class="config-label" style="margin-bottom: 8px; color: var(--text-secondary);">Endpoint URL
+                    </div>
+                    <input type="text" id="api-url-input" class="custom-textarea"
+                        style="width: 100%; height: 38px; padding: 0 12px; font-family: monospace;"
+                        placeholder="http://localhost:11434/v1">
+                </div>
+                <div>
+                    <div class="config-label" style="margin-bottom: 8px; color: var(--text-secondary);">Model ID / Name
+                    </div>
+                    <input type="text" id="api-model-input" class="custom-textarea"
+                        style="width: 100%; height: 38px; padding: 0 12px; font-family: monospace;"
+                        placeholder="e.g. llama3">
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 16px 20px;">
+                <button class="load-model-btn" id="connect-api-btn"
+                    style="width: 100%; justify-content: center; padding: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Connect & Configure
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="downloads-modal" class="modal-overlay">
+        <div class="modal-content"
+            style="width: 85vw; max-width: 1200px; height: 85vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div class="modal-header">
+                <h3>Model Downloads</h3>
+                <button class="close-modal-btn" id="close-downloads-modal">&times;</button>
+            </div>
+
+            <div class="modal-body"
+                style="flex: 1; display: flex; flex-direction: column; padding: 0; margin: 0; min-height: 0;">
+
+                <div id="downloads-content-container" style="flex: 1; padding: 20px; overflow-y: auto;">
+                    <h1>jjj</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+
+</html>
